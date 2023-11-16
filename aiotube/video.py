@@ -17,12 +17,16 @@ class Video:
         video_id : str
             The id or url of the video
         """
-        pattern = re.compile('.be/(.*?)$|=(.*?)$|^(\w{11})$')  # noqa
-        self._matched_id = (
-                pattern.search(video_id).group(1)
-                or pattern.search(video_id).group(2)
-                or pattern.search(video_id).group(3)
-        )
+        try:
+            pattern = re.compile('.be/(.*?)$|=(.*?)$|^(\w{11})$')  # noqa
+            self._matched_id = (
+                    pattern.search(video_id).group(1)
+                    or pattern.search(video_id).group(2)
+                    or pattern.search(video_id).group(3)
+            )
+        except AttributeError:
+            # some video id is not match, example: 'UeqP-7eEgc8'
+            self._matched_id = video_id
         if self._matched_id:
             self._url = self._HEAD + self._matched_id
             self._video_data = video_data(self._matched_id)
