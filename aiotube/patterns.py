@@ -27,6 +27,8 @@ class _ChannelPatterns:
     upload_chunk_fl_2 = re.compile("default_live.")
     upcoming_check = re.compile("\"title\":\"Upcoming live streams\"")
     upcoming = re.compile("gridVideoRenderer\":{\"videoId\":\"(.*?)\"")
+    avatar2 = re.compile("\"avatar\":{\"thumbnails\":\[{\"url\":\"(.*?)\"")
+    banner2 = re.compile("width\":1060,\"height\":175},{\"url\":\"(.*?)\"")
 
 
 class _VideoPatterns:
