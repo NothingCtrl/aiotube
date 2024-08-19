@@ -116,7 +116,7 @@ class Channel:
             "avatar": avatar,
             "banner": banner,
             "verified": bool(verified),
-            "socials": unquote(socials)
+            "socials": unquote(socials) if socials else ""
         }
 
     @property
