@@ -88,7 +88,16 @@ class Channel:
         extracted = collect(lambda x: x.findall(self._about_page) or None, patterns)
         name, avatar, banner, verified, socials = [e[0] if e else None for e in extracted]
         info = re.compile("\\[{\"aboutChannelRenderer\":(.*?)],").search(self._about_page).group(1) + "]}}}}"
-        info = json.loads(info)["metadata"]["aboutChannelViewModel"]
+        try:
+            info = json.loads(info)["metadata"]["aboutChannelViewModel"]
+        except json.decoder.JSONDecodeError:
+            try:
+                info = re.compile("\\[{\"aboutChannelRenderer\":(.*?)],").search(self._about_page).group(1) + "]}}}"
+                info = json.loads(info)["metadata"]["aboutChannelViewModel"]
+            except json.decoder.JSONDecodeError:
+                info = re.compile("\\[{\"aboutChannelRenderer\":(.*?)],").search(self._about_page).group(1)
+                info = json.loads(info[:len(info)-2])["metadata"]["aboutChannelViewModel"]
+
         return {
             "id": info["channelId"],
             "name": name,
