@@ -51,7 +51,10 @@ class Video:
         upload_date_pattern = re.compile("<meta itemprop=\"uploadDate\" content=\"(.*?)\">")
         genre_pattern = re.compile("<meta itemprop=\"genre\" content=\"(.*?)\">")
         like_count_pattern = re.compile("iconType\":\"LIKE\"},\"defaultText\":(.*?)}}")
-        raw_details = details_pattern.search(self._video_data).group(0)
+        groups = details_pattern.search(self._video_data)
+        if not groups:
+            groups = re.compile('videoDetails\":(.*?)\"autonavToggle\":.*?}').search(self._video_data)
+        raw_details = groups.group(0)
         upload_date = upload_date_pattern.search(self._video_data).group(1)
         metadata = json.loads(raw_details.replace('videoDetails\":', ''))
         data = {
