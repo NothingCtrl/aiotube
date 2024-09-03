@@ -55,8 +55,11 @@ class Video:
         if not groups:
             groups = re.compile('videoDetails\":(.*?)\"autonavToggle\":.*?}').search(self._video_data)
         raw_details = groups.group(0)
-        upload_date = upload_date_pattern.search(self._video_data).group(1)
+        if ',"autonavToggle":' in raw_details:
+            raw_details = raw_details.split(',"autonavToggle":')[0]
         metadata = json.loads(raw_details.replace('videoDetails\":', ''))
+        if "title" not in metadata:
+            return {}
         data = {
             'title': metadata['title'],
             'id': metadata['videoId'],
@@ -64,11 +67,13 @@ class Video:
             'streamed': metadata['isLiveContent'],
             'duration': metadata['lengthSeconds'],
             'author_id': metadata['channelId'],
-            'upload_date': upload_date,
+            'upload_date': None,
             'url': f"https://www.youtube.com/watch?v={metadata['videoId']}",
             'thumbnails': metadata.get('thumbnail', {}).get('thumbnails'),
             'tags': metadata.get('keywords'),
             'description': metadata.get('shortDescription'),
+            'likes': None,
+            'genre': None
         }
         try:
             likes_count = like_count_pattern.search(self._video_data).group(1)
@@ -76,9 +81,13 @@ class Video:
                 'accessibility'
             ]['accessibilityData']['label'].split(' ')[0].replace(',', '')
         except (AttributeError, KeyError, json.decoder.JSONDecodeError):
-            data['likes'] = None
+            pass
         try:
             data['genre'] = genre_pattern.search(self._video_data).group(1)
         except AttributeError:
-            data['genre'] = None
+            pass
+        try:
+            data['upload_date'] = upload_date_pattern.search(self._video_data).group(1)
+        except AttributeError:
+            pass
         return data
